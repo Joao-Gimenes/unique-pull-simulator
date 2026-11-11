@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -17,6 +17,7 @@
 body{margin:0;background:radial-gradient(1200px 700px at 50% -10%,#3a1d6e 0%,var(--bg) 60%) fixed,var(--bg);
   color:var(--text);font-family:Fredoka,system-ui,"Segoe UI",sans-serif;min-height:100vh}
 .wrap{max-width:1040px;margin:0 auto;padding:20px 16px 60px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 h1{font-size:clamp(24px,4vw,34px);margin:0;font-weight:700;letter-spacing:.3px}
 h1 span{background:linear-gradient(90deg,#ff5fd2,#ffb62e,#3ddc5a,#4aa8ff,#b06bff);-webkit-background-clip:text;background-clip:text;color:transparent}
 .sub{color:var(--muted);margin:4px 0 18px;font-size:14px}
@@ -151,8 +152,9 @@ body.shake .wrap{animation:shake .45s linear .25s}
 </head>
 <body>
 <div class="wrap">
-  <h1><span>Unique</span> Pull Simulator</h1>
-  <div class="sub">Simulador de giros de trait — chances da wiki oficial do Anime Adventures. Unique = 0,1% por giro.</div>
+  <div class="top"><h1><span>Unique</span> Pull Simulator</h1>
+    <span class="seg" id="lang" role="group" aria-label="Language"><button data-l="en">EN</button><button data-l="pt">PT</button></span></div>
+  <div class="sub" data-i="sub"></div>
 
   <div class="grid" style="margin-top:0">
     <div>
@@ -161,38 +163,38 @@ body.shake .wrap{animation:shake .45s linear .25s}
         <div class="slot">
           <div class="frame"><div class="in"><span class="lv">Lv. 110</span><span class="sec">Secret</span>
             <span class="nm">Explosion Mage<br>(Archdemon)</span></div></div>
-          <div class="trait" id="trait">Sem trait<small>gire para começar</small></div>
+          <div class="trait" id="trait"></div>
         </div>
         <div class="btns">
           <button class="b roll" id="btnRoll">Reroll</button>
-          <button class="b auto" id="btnAuto">Auto</button>
-          <button class="b inst" id="btnInst">Até o Unique ⚡</button>
-          <button class="b du" id="btnDU">Até Unique + outra trait 👑➕</button>
-          <button class="b dd" id="btnDD">Até o Double Unique 👑👑</button>
+          <button class="b auto" id="btnAuto" data-i="auto"></button>
+          <button class="b inst" id="btnInst" data-i="btnInst"></button>
+          <button class="b du" id="btnDU" data-i="btnDU"></button>
+          <button class="b dd" id="btnDD" data-i="btnDD"></button>
         </div>
         <div class="opts">
-          <span style="display:flex;gap:8px;align-items:center">Velocidade do auto
-            <span class="seg" id="speed" role="group" aria-label="Velocidade do auto"><button data-v="140">Lento</button><button data-v="60" class="on">Normal</button><button data-v="16">Rápido</button></span></span>
-          <label class="sw"><input type="checkbox" id="sound" checked> Som</label>
-          <label class="sw"><input type="checkbox" id="stopMythic"> Parar o auto em qualquer Mythic</label>
+          <span style="display:flex;gap:8px;align-items:center"><span data-i="speedLbl"></span>
+            <span class="seg" id="speed" role="group"><button data-v="140" data-i="slow"></button><button data-v="60" class="on" data-i="normal"></button><button data-v="16" data-i="fast"></button></span></span>
+          <label class="sw"><input type="checkbox" id="sound" checked> <span data-i="sound"></span></label>
+          <label class="sw"><input type="checkbox" id="stopMythic"> <span data-i="stopMythic"></span></label>
         </div>
-        <div class="hint">Espaço = Reroll · O auto sempre para quando sai Unique</div>
-        <div class="btns"><button class="b sm" id="btnTest">Ver animação do Unique</button><button class="b sm" id="btnReset">Zerar tudo</button></div>
+        <div class="hint" data-i="hint"></div>
+        <div class="btns"><button class="b sm" id="btnTest" data-i="btnTest"></button><button class="b sm" id="btnReset" data-i="btnReset"></button></div>
       </div>
 
       <div class="panel" style="margin-top:16px">
-        <h2>Sua sorte</h2>
+        <h2 data-i="hLuck"></h2>
         <div class="stats">
-          <div class="st"><b id="sUnit">0</b><span>giros nesta unit</span></div>
-          <div class="st"><b id="sSince">0</b><span>giros desde o último Unique</span></div>
-          <div class="st"><b id="sTotal">0</b><span>giros no total</span></div>
-          <div class="st"><b id="sUniq">0</b><span>Uniques pegos</span></div>
-          <div class="st"><b id="sSinceDU">0</b><span>giros desde o último Unique + outra trait</span></div>
-          <div class="st"><b id="sDU">0</b><span>Unique + outra trait pegos</span></div>
-          <div class="st"><b id="sSinceD">0</b><span>giros desde o último Double Unique</span></div>
-          <div class="st"><b id="sDD">0</b><span>Double Uniques pegos</span></div>
-          <div class="st"><b id="sRem">0</b><span>Star Remnants gastos (5/giro)</span></div>
-          <div class="st"><b id="sTok">0</b><span>ou Reroll Tokens (1/giro) ≈ <i id="sRbx">0</i> R$</span></div>
+          <div class="st"><b id="sUnit">0</b><span data-i="sUnit"></span></div>
+          <div class="st"><b id="sSince">0</b><span data-i="sSince"></span></div>
+          <div class="st"><b id="sTotal">0</b><span data-i="sTotal"></span></div>
+          <div class="st"><b id="sUniq">0</b><span data-i="sUniq"></span></div>
+          <div class="st"><b id="sSinceDU">0</b><span data-i="sSinceDU"></span></div>
+          <div class="st"><b id="sDU">0</b><span data-i="sDU"></span></div>
+          <div class="st"><b id="sSinceD">0</b><span data-i="sSinceD"></span></div>
+          <div class="st"><b id="sDD">0</b><span data-i="sDD"></span></div>
+          <div class="st"><b id="sRem">0</b><span data-i="sRem"></span></div>
+          <div class="st"><b id="sTok">0</b><span data-i="sTok"></span></div>
         </div>
         <div class="luck" id="luck"></div>
       </div>
@@ -200,21 +202,17 @@ body.shake .wrap{animation:shake .45s linear .25s}
 
     <div>
       <div class="panel">
-        <h2>Chances e o que já saiu</h2>
+        <h2 data-i="hOdds"></h2>
         <table id="tbl"></table>
       </div>
       <div class="panel" style="margin-top:16px">
-        <h2>Traits raros que saíram</h2>
+        <h2 data-i="hLog"></h2>
         <div class="log" id="log"></div>
       </div>
     </div>
   </div>
 
-  <div class="foot">
-    Chances tiradas da página <a href="https://animeadventures.fandom.com/wiki/Traits" target="_blank" rel="noopener">Traits</a> da wiki do Anime Adventures (Fandom),
-    incluindo 0,2% de chance de trait duplo em cada giro. A wiki não informa a chance de cada nível (I/II/III) de Superior, Nimble e Range,
-    então aqui os três níveis têm chance igual. Projeto de fã, sem ligação com os criadores do jogo; não usa arte nem áudio do jogo.
-  </div>
+  <div class="foot" data-i="foot"></div>
 </div>
 
 <div id="fx" aria-hidden="true"></div>
@@ -249,7 +247,83 @@ const ROBUX_PER_TOKEN = 90;    // pacote de 50 tokens por 4500 R$
 const COLORS = {rare:'var(--rare)',epic:'var(--epic)',legendary:'var(--legendary)',mythic:'var(--mythic)'};
 const ROMAN = ['I','II','III'];
 const $ = id => document.getElementById(id);
-const fmt = n => n.toLocaleString('pt-BR');
+
+// ---------- idiomas (padrão: inglês) ----------
+const WIKI_LINK = `<a href="https://animeadventures.fandom.com/wiki/Traits" target="_blank" rel="noopener">Traits</a>`;
+const I18N = {
+  en:{
+    sub:'Trait reroll simulator — odds from the official Anime Adventures wiki. Unique = 0.1% per roll.',
+    noTrait:'No trait', noTraitSub:'roll to start', doubleTag:'DOUBLE TRAIT! ',
+    auto:'Auto', stop:'Stop', btnInst:'Until Unique ⚡', btnDU:'Until Unique + another trait 👑➕', btnDD:'Until Double Unique 👑👑',
+    speedLbl:'Auto speed', slow:'Slow', normal:'Normal', fast:'Fast', sound:'Sound', stopMythic:'Stop auto on any Mythic',
+    hint:'Space = Reroll · Auto always stops when Unique drops',
+    btnTest:'Preview Unique animation', btnReset:'Reset everything', resetArm:'Click again to reset',
+    hLuck:'Your luck', hOdds:"Odds and what you've rolled", hLog:'Rare traits rolled',
+    sUnit:'rolls on this unit', sSince:'rolls since last Unique', sTotal:'total rolls', sUniq:'Uniques obtained',
+    sSinceDU:'rolls since last Unique + another trait', sDU:'Unique + another trait obtained',
+    sSinceD:'rolls since last Double Unique', sDD:'Double Uniques obtained',
+    sRem:'Star Remnants spent (5/roll)', sTok:'or Reroll Tokens (1/roll) ≈ <i id="sRbx">0</i> R$',
+    foot:`Odds taken from the ${WIKI_LINK} page of the Anime Adventures wiki (Fandom), including the 0.2% chance of a double trait on each roll. The wiki doesn't list the odds for each tier (I/II/III) of Superior, Nimble and Range, so here the three tiers are equally likely. Fan project, not affiliated with the game's creators; trait icons are loaded from the wiki and the sound is synthesized.`,
+    luckAvg:(a,m)=>`On average it takes <b>${a}</b> rolls to get Unique (half of people get it within <b>${m}</b>).`,
+    luckLast:(n,p,unit)=>`Your last Unique on ${unit} took <b>${n}</b> rolls — luckier than <b>${p}%</b> of attempts.`,
+    luckDry:(n,p)=>`Current dry streak: ${n} rolls. <b>${p}%</b> of people would already have Unique by now.`,
+    duTitle:'Unique + another trait',
+    duOdds:x=>`: 1 in <b>${x}</b> chance per roll (0.2% double trait with exactly one Unique).`,
+    duLast:(n,p,r)=>`The last one took <b>${n}</b> rolls — luckier than <b>${p}%</b> of attempts. That would be <b>${r}</b> Star Remnants.`,
+    ddOdds:x=>`: 1 in <b>${x}</b> chance per roll (0.2% double trait × 0.1% Unique × 0.1% Unique).`,
+    ddLast:(n,p,r)=>`Your last Double Unique took <b>${n}</b> rolls — luckier than <b>${p}%</b> of attempts. That would be <b>${r}</b> Star Remnants.`,
+    thTrait:'Trait', thOdds:'Odds', thGot:'Rolled', thRate:'Your rate', doubleRow:'Double trait',
+    logRoll:n=>`roll ${n}`, logEmpty:'Nothing yet. Mythics, Uniques and double traits show up here.',
+    testWho:" (test — doesn't count)", progress:x=>`Stop · ${x}M rolls`,
+  },
+  pt:{
+    sub:'Simulador de giros de trait — chances da wiki oficial do Anime Adventures. Unique = 0,1% por giro.',
+    noTrait:'Sem trait', noTraitSub:'gire para começar', doubleTag:'TRAIT DUPLO! ',
+    auto:'Auto', stop:'Parar', btnInst:'Até o Unique ⚡', btnDU:'Até Unique + outra trait 👑➕', btnDD:'Até o Double Unique 👑👑',
+    speedLbl:'Velocidade do auto', slow:'Lento', normal:'Normal', fast:'Rápido', sound:'Som', stopMythic:'Parar o auto em qualquer Mythic',
+    hint:'Espaço = Reroll · O auto sempre para quando sai Unique',
+    btnTest:'Ver animação do Unique', btnReset:'Zerar tudo', resetArm:'Clique de novo para zerar',
+    hLuck:'Sua sorte', hOdds:'Chances e o que já saiu', hLog:'Traits raros que saíram',
+    sUnit:'giros nesta unit', sSince:'giros desde o último Unique', sTotal:'giros no total', sUniq:'Uniques pegos',
+    sSinceDU:'giros desde o último Unique + outra trait', sDU:'Unique + outra trait pegos',
+    sSinceD:'giros desde o último Double Unique', sDD:'Double Uniques pegos',
+    sRem:'Star Remnants gastos (5/giro)', sTok:'ou Reroll Tokens (1/giro) ≈ <i id="sRbx">0</i> R$',
+    foot:`Chances tiradas da página ${WIKI_LINK} da wiki do Anime Adventures (Fandom), incluindo 0,2% de chance de trait duplo em cada giro. A wiki não informa a chance de cada nível (I/II/III) de Superior, Nimble e Range, então aqui os três níveis têm chance igual. Projeto de fã, sem ligação com os criadores do jogo; os ícones das traits são carregados da wiki e o som é sintetizado.`,
+    luckAvg:(a,m)=>`Em média leva <b>${a}</b> giros para sair Unique (metade das pessoas pega em até <b>${m}</b>).`,
+    luckLast:(n,p,unit)=>`Seu último Unique na ${unit} saiu em <b>${n}</b> giros — mais sortudo que <b>${p}%</b> das tentativas.`,
+    luckDry:(n,p)=>`Seca atual: ${n} giros. <b>${p}%</b> das pessoas já teriam pego o Unique até aqui.`,
+    duTitle:'Unique + outra trait',
+    duOdds:x=>`: chance de 1 em <b>${x}</b> por giro (trait duplo 0,2% com exatamente um Unique).`,
+    duLast:(n,p,r)=>`O último saiu em <b>${n}</b> giros — mais sortudo que <b>${p}%</b> das tentativas. Seriam <b>${r}</b> Star Remnants.`,
+    ddOdds:x=>`: chance de 1 em <b>${x}</b> por giro (trait duplo 0,2% × Unique 0,1% × Unique 0,1%).`,
+    ddLast:(n,p,r)=>`Seu último Double Unique saiu em <b>${n}</b> giros — mais sortudo que <b>${p}%</b> das tentativas. Seriam <b>${r}</b> Star Remnants.`,
+    thTrait:'Trait', thOdds:'Chance', thGot:'Saiu', thRate:'Sua taxa', doubleRow:'Trait duplo',
+    logRoll:n=>`giro ${n}`, logEmpty:'Nada ainda. Mythics, Uniques e traits duplos aparecem aqui.',
+    testWho:' (teste — não conta)', progress:x=>`Parar · ${x} mi de giros`,
+  },
+};
+const DESC_EN = {
+  superior:['+10% damage','+12.5% damage','+15% damage'], nimble:['-5% SPA','-7.5% SPA','-12% SPA'], range:['+10% range','+12.5% range','+15% range'],
+  adept:'+50% XP', culling:'+20% damage to enemies at ≤30% health', sniper:'+25% range', godspeed:'-20% SPA',
+  reaper:'+15% damage, +25% damage to bosses', celestial:'+10% damage, +10% range, +20% true damage',
+  divine:'+20% damage, -10% SPA, +20% range', golden:'+30% damage, +20% Yen',
+  unique:'4x damage (+300%), -10% SPA, +10% range · only 1 of the unit placed',
+};
+let LANG='en'; try{ if(localStorage.getItem('ups-lang')==='pt') LANG='pt'; }catch(e){}
+const tx = (k,...a)=>{ const v=I18N[LANG][k]; return typeof v==='function'?v(...a):v; };
+const fmt = n => n.toLocaleString(LANG==='pt'?'pt-BR':'en-US');
+const dec = (x,d)=>{ const s=x.toFixed(d); return LANG==='pt'?s.replace('.',','):s; };
+const pct = w => LANG==='pt'?String(w).replace('.',','):String(w);
+const descRaw = id => LANG==='pt'?TRAITS.find(t=>t.id===id).desc:DESC_EN[id];
+const descOf = tr => { const d=descRaw(tr.id); return Array.isArray(d)?d[tr.tier-1]:d; };
+const descAll = id => { const d=descRaw(id); return Array.isArray(d)?d.join(' / '):d; };
+function applyLang(){
+  document.documentElement.lang = LANG==='pt'?'pt-BR':'en';
+  document.querySelectorAll('[data-i]').forEach(e=>e.innerHTML=tx(e.dataset.i));
+  $('speed').setAttribute('aria-label',tx('speedLbl'));
+  for(const b of $('lang').children) b.classList.toggle('on',b.dataset.l===LANG);
+  render();
+}
 
 // ---------- estado ----------
 const KEY='ups-state-v1';
@@ -305,9 +379,9 @@ function render(pop){
   const unit=UNITS.find(x=>x.id===S.sel), u=S.units[S.sel];
   const el=$('trait');
   if(u.traits){
-    const d=u.traits.map(tr=>{const t=T(tr.id);return t.tier?t.desc[tr.tier-1]:t.desc}).join(' · ');
-    el.innerHTML=u.traits.map(traitHTML).join(' + ')+`<small>${u.traits.length===2?'TRAIT DUPLO! ':''}${d}</small>`;
-  } else el.innerHTML=`Sem trait<small>gire para começar</small>`;
+    const d=u.traits.map(descOf).join(' · ');
+    el.innerHTML=u.traits.map(traitHTML).join(' + ')+`<small>${u.traits.length===2?tx('doubleTag'):''}${d}</small>`;
+  } else el.innerHTML=`${tx('noTrait')}<small>${tx('noTraitSub')}</small>`;
   if(pop){ el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); }
 
   const total=UNITS.reduce((s,x)=>s+S.units[x.id].rolls,0);
@@ -320,38 +394,38 @@ function render(pop){
 
   // sorte
   const avg=Math.round(1/P_UNIQUE), med=Math.ceil(Math.log(.5)/Math.log(1-P_UNIQUE));
-  let h=`Em média leva <b>${fmt(avg)}</b> giros para sair Unique (metade das pessoas pega em até <b>${fmt(med)}</b>).`;
+  let h=tx('luckAvg',fmt(avg),fmt(med));
   if(u.nUniq){
     const n=u.lastUniq, worse=(1-P_UNIQUE)**n*100;
-    h+=`<br>Seu último Unique na ${unit.name} saiu em <b>${fmt(n)}</b> giros — mais sortudo que <b>${worse.toFixed(1).replace('.',',')}%</b> das tentativas.`;
+    h+='<br>'+tx('luckLast',fmt(n),dec(worse,1),unit.name);
   }
   if(u.since>0){
     const p=(1-(1-P_UNIQUE)**u.since)*100;
-    h+=`<br>Seca atual: ${fmt(u.since)} giros. <b>${p.toFixed(1).replace('.',',')}%</b> das pessoas já teriam pego o Unique até aqui.`;
+    h+='<br>'+tx('luckDry',fmt(u.since),dec(p,1));
   }
-  h+=`<br><br><span class="rainbow" style="font-weight:700">Unique + outra trait</span>: chance de 1 em <b>${fmt(Math.round(1/P_DU))}</b> por giro (trait duplo 0,2% com exatamente um Unique).`;
+  h+=`<br><br><span class="rainbow" style="font-weight:700">${tx('duTitle')}</span>`+tx('duOdds',fmt(Math.round(1/P_DU)));
   if(u.nDU){
     const n=u.lastDU, worse=Math.exp(-P_DU*n)*100;
-    h+=`<br>O último saiu em <b>${fmt(n)}</b> giros — mais sortudo que <b>${worse.toFixed(1).replace('.',',')}%</b> das tentativas. Seriam <b>${fmt(n*REMNANTS_PER_ROLL)}</b> Star Remnants.`;
+    h+='<br>'+tx('duLast',fmt(n),dec(worse,1),fmt(n*REMNANTS_PER_ROLL));
   }
-  h+=`<br><br><span class="rainbow" style="font-weight:700">Double Unique</span>: chance de 1 em <b>${fmt(Math.round(1/P_DD))}</b> por giro (trait duplo 0,2% × Unique 0,1% × Unique 0,1%).`;
+  h+=`<br><br><span class="rainbow" style="font-weight:700">Double Unique</span>`+tx('ddOdds',fmt(Math.round(1/P_DD)));
   if(u.dd.length){
     const n=u.dd[u.dd.length-1], worse=Math.exp(-P_DD*n)*100;
-    h+=`<br>Seu último Double Unique saiu em <b>${fmt(n)}</b> giros — mais sortudo que <b>${worse.toFixed(1).replace('.',',')}%</b> das tentativas. Seriam <b>${fmt(n*REMNANTS_PER_ROLL)}</b> Star Remnants.`;
+    h+='<br>'+tx('ddLast',fmt(n),dec(worse,1),fmt(n*REMNANTS_PER_ROLL));
   }
   $('luck').innerHTML=h;
 
   // tabela
   const allT=TRAITS.reduce((s,t)=>s+(S.counts[t.id]||0),0);
-  $('tbl').innerHTML=`<tr><th>Trait</th><th class="n">Chance</th><th class="n">Saiu</th><th class="n">Sua taxa</th></tr>`+
+  $('tbl').innerHTML=`<tr><th>${tx('thTrait')}</th><th class="n">${tx('thOdds')}</th><th class="n">${tx('thGot')}</th><th class="n">${tx('thRate')}</th></tr>`+
     TRAITS.map(t=>{const c=S.counts[t.id]||0;
-      return `<tr title="${t.tier?t.desc.join(' / '):t.desc}"><td>${iconHTML(t.id)}${t.rar==='unique'||t.rar==='mythic'?`<span class="rainbow" style="font-weight:700">${t.name}</span>`:`<span style="color:${COLORS[t.rar]};font-weight:600">${t.name}</span>`}</td>
-      <td class="n">${String(t.w).replace('.',',')}%</td><td class="n">${fmt(c)}</td>
-      <td class="n">${allT?(c/allT*100).toFixed(c&&c/allT<.01?3:2).replace('.',',')+'%':'—'}</td></tr>`}).join('')+
-    `<tr><td style="color:var(--muted)">Trait duplo</td><td class="n">0,2%</td><td class="n">${fmt(S.doubles)}</td><td class="n">${total?(S.doubles/total*100).toFixed(2).replace('.',',')+'%':'—'}</td></tr>`;
+      return `<tr title="${descAll(t.id)}"><td>${iconHTML(t.id)}${t.rar==='unique'||t.rar==='mythic'?`<span class="rainbow" style="font-weight:700">${t.name}</span>`:`<span style="color:${COLORS[t.rar]};font-weight:600">${t.name}</span>`}</td>
+      <td class="n">${pct(t.w)}%</td><td class="n">${fmt(c)}</td>
+      <td class="n">${allT?dec(c/allT*100,c&&c/allT<.01?3:2)+'%':'—'}</td></tr>`}).join('')+
+    `<tr><td style="color:var(--muted)">${tx('doubleRow')}</td><td class="n">${pct(0.2)}%</td><td class="n">${fmt(S.doubles)}</td><td class="n">${total?dec(S.doubles/total*100,2)+'%':'—'}</td></tr>`;
 
-  $('log').innerHTML=S.log.length?S.log.map(l=>`<div><span>${l.t.map(traitHTML).join(' + ')} <em>· ${UNITS.find(x=>x.id===l.u).name}</em></span><em>giro ${fmt(l.n)}</em></div>`).join('')
-    :`<div><em>Nada ainda. Mythics, Uniques e traits duplos aparecem aqui.</em></div>`;
+  $('log').innerHTML=S.log.length?S.log.map(l=>`<div><span>${l.t.map(traitHTML).join(' + ')} <em>· ${UNITS.find(x=>x.id===l.u).name}</em></span><em>${tx('logRoll',fmt(l.n))}</em></div>`).join('')
+    :`<div><em>${tx('logEmpty')}</em></div>`;
 }
 
 // ---------- som (sintetizado, nada do jogo) ----------
@@ -398,7 +472,7 @@ $('fx').onclick=()=>{clearTimeout(fxTimer);$('fx').classList.remove('on')};
 
 // ---------- ações ----------
 let autoT=null;
-function stopAuto(){ clearInterval(autoT); autoT=null; $('btnAuto').classList.remove('on'); $('btnAuto').textContent='Auto'; }
+function stopAuto(){ clearInterval(autoT); autoT=null; $('btnAuto').classList.remove('on'); $('btnAuto').textContent=tx('auto'); }
 function doRoll(){
   const r=applyRoll(); render(true); save();
   if(r.uniq){ stopAuto(); celebrate(r.uniq,UNITS.find(x=>x.id===S.sel).name,r.plus); }
@@ -408,7 +482,7 @@ function doRoll(){
 $('btnRoll').onclick=()=>{ stopAuto(); doRoll(); };
 $('btnAuto').onclick=()=>{
   if(autoT) return stopAuto();
-  $('btnAuto').classList.add('on'); $('btnAuto').textContent='Parar';
+  $('btnAuto').classList.add('on'); $('btnAuto').textContent=tx('stop');
   autoT=setInterval(doRoll,speedMs);
 };
 let speedMs=60;
@@ -425,9 +499,9 @@ $('btnInst').onclick=()=>{
 const CUM=[]; { let a=0; for(const t of TRAITS){ a+=t.w/TOTAL_W; CUM.push(a); } }
 const UQ=TRAITS.length-1;
 let ddRun=false;
-let fastBtn=null; const FAST_LABEL={btnDD:'Até o Double Unique 👑👑',btnDU:'Até Unique + outra trait 👑➕'};
+let fastBtn=null;
 function setBusy(on){ for(const id of ['btnRoll','btnAuto','btnInst','btnTest','btnReset','btnDD','btnDU']) $(id).disabled=on&&id!==fastBtn; }
-function stopDD(){ ddRun=false; if(fastBtn){ $(fastBtn).classList.remove('on'); $(fastBtn).textContent=FAST_LABEL[fastBtn]; } fastBtn=null; setBusy(false); render(true); save(); }
+function stopDD(){ ddRun=false; if(fastBtn){ $(fastBtn).classList.remove('on'); $(fastBtn).textContent=tx(fastBtn); } fastBtn=null; setBusy(false); render(true); save(); }
 // mode 'dd' = dois Uniques no mesmo giro · 'du' = trait duplo com exatamente um Unique
 function runFast(mode,id){
   if(ddRun) return stopDD();
@@ -459,24 +533,28 @@ function runFast(mode,id){
       S.log.unshift({u:S.sel,t:u.traits,n:u.rolls}); if(S.log.length>60) S.log.length=60;
       const tr=u.traits; stopDD(); celebrate(mode==='dd'?2:1,UNITS.find(x=>x.id===S.sel).name,mode==='du'?label(tr[1]):''); return;
     }
-    $(id).textContent=`Parar · ${(started/1e6).toFixed(1).replace('.',',')} mi de giros`;
+    $(id).textContent=tx('progress',dec(started/1e6,1));
     $('sUnit').textContent=$('sTotal').textContent=fmt(u.rolls); $('sSinceD').textContent=fmt(u.sinceD); $('sUniq').textContent=fmt(u.nUniq);
     setTimeout(chunk,0);
   })();
 }
 $('btnDD').onclick=()=>runFast('dd','btnDD');
 $('btnDU').onclick=()=>runFast('du','btnDU');
-$('btnTest').onclick=()=>celebrate(1,UNITS.find(x=>x.id===S.sel).name+' (teste — não conta)');
+$('btnTest').onclick=()=>celebrate(1,UNITS.find(x=>x.id===S.sel).name+tx('testWho'));
 let resetArm=null;
 $('btnReset').onclick=()=>{
   const b=$('btnReset');
-  if(!resetArm){ b.textContent='Clique de novo para zerar'; b.style.background='#d93a3a';
-    resetArm=setTimeout(()=>{resetArm=null;b.textContent='Zerar tudo';b.style.background=''},3000); return; }
-  clearTimeout(resetArm); resetArm=null; b.textContent='Zerar tudo'; b.style.background='';
+  if(!resetArm){ b.textContent=tx('resetArm'); b.style.background='#d93a3a';
+    resetArm=setTimeout(()=>{resetArm=null;b.textContent=tx('btnReset');b.style.background=''},3000); return; }
+  clearTimeout(resetArm); resetArm=null; b.textContent=tx('btnReset'); b.style.background='';
   stopAuto(); const sel=S.sel; S={sel,units:{},counts:{},doubles:0,log:[]};
   for(const u of UNITS) S.units[u.id]=newUnit(); save(); render(); };
 addEventListener('keydown',e=>{ if(e.code==='Space'&&!/SELECT|INPUT|BUTTON/.test(e.target.tagName)){ e.preventDefault(); if($('fx').classList.contains('on')) return $('fx').onclick(); if(ddRun) return; stopAuto(); doRoll(); } });
-render();
+$('lang').onclick=e=>{ const b=e.target.closest('button'); if(!b||b.dataset.l===LANG) return;
+  stopAuto(); if(ddRun) stopDD();
+  if(resetArm){ clearTimeout(resetArm); resetArm=null; $('btnReset').style.background=''; }
+  LANG=b.dataset.l; try{localStorage.setItem('ups-lang',LANG)}catch(e){} applyLang(); };
+applyLang();
 </script>
 </body>
 </html>
