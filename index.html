@@ -64,6 +64,9 @@ button.b:active{transform:translateY(3px);box-shadow:0 1px 0 #0007}
 .b.auto{background:linear-gradient(#58e374,#27b545)}
 .b.auto.on{background:linear-gradient(#ff7a7a,#d93a3a)}
 .b.inst{background:linear-gradient(#6fb9ff,#2f7fe0)}
+.b.dd{background:linear-gradient(90deg,#ff5fd2,#ffb62e,#3ddc5a,#4aa8ff,#b06bff);font-variant-numeric:tabular-nums}
+.b.dd.on{background:linear-gradient(#ff7a7a,#d93a3a)}
+button.b:disabled{opacity:.45;cursor:not-allowed;filter:none}
 .b.sm{font-size:13px;padding:8px 12px;background:#3b2a68;font-weight:600}
 .opts{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-top:12px;color:var(--muted);font-size:13px}
 .opts label{display:flex;gap:6px;align-items:center;cursor:pointer}
@@ -146,6 +149,7 @@ body.shake .wrap{animation:shake .45s linear .25s}
           <button class="b roll" id="btnRoll">Reroll</button>
           <button class="b auto" id="btnAuto">Auto</button>
           <button class="b inst" id="btnInst">Até o Unique ⚡</button>
+          <button class="b dd" id="btnDD">Até o Double Unique 👑👑</button>
         </div>
         <div class="opts">
           <label>Velocidade do auto
@@ -164,6 +168,8 @@ body.shake .wrap{animation:shake .45s linear .25s}
           <div class="st"><b id="sSince">0</b><span>giros desde o último Unique</span></div>
           <div class="st"><b id="sTotal">0</b><span>giros no total</span></div>
           <div class="st"><b id="sUniq">0</b><span>Uniques pegos</span></div>
+          <div class="st"><b id="sSinceD">0</b><span>giros desde o último Double Unique</span></div>
+          <div class="st"><b id="sDD">0</b><span>Double Uniques pegos</span></div>
           <div class="st"><b id="sRem">0</b><span>Star Remnants gastos (5/giro)</span></div>
           <div class="st"><b id="sTok">0</b><span>ou Reroll Tokens (1/giro) ≈ <i id="sRbx">0</i> R$</span></div>
         </div>
@@ -211,6 +217,7 @@ const TRAITS = [
 const TOTAL_W = TRAITS.reduce((s,t)=>s+t.w,0);          // a wiki soma 100,03 — normalizamos
 const DOUBLE_CHANCE = 0.002;                              // 0,2% de trait duplo
 const P_UNIQUE_SINGLE = 0.1/TOTAL_W;
+const P_DD = DOUBLE_CHANCE*P_UNIQUE_SINGLE**2;             // double Unique: ~1 em 500 milhões
 const P_UNIQUE = (1-DOUBLE_CHANCE)*P_UNIQUE_SINGLE + DOUBLE_CHANCE*(1-(1-P_UNIQUE_SINGLE)**2);
 const UNITS = [
   {id:'megumin', name:'Megumin', ig:'Explosion Mage (Archdemon)', rar:'Secret'},
@@ -226,7 +233,10 @@ const fmt = n => n.toLocaleString('pt-BR');
 const KEY='ups-state-v1';
 let S = {sel:'enel', units:{}, counts:{}, doubles:0, log:[]};
 try{ const j=JSON.parse(localStorage.getItem(KEY)); if(j&&j.units) S=j; }catch(e){}
-S.sel='megumin'; S.units={megumin:S.units.megumin||{traits:null, rolls:0, since:0, uniques:[]}};
+const newUnit = ()=>({traits:null, rolls:0, since:0, nUniq:0, lastUniq:0, sinceD:0, dd:[]});
+S.sel='megumin'; S.units={megumin:S.units.megumin||newUnit()};
+{ const u=S.units.megumin;   // migra estado salvo de versões antigas
+  u.nUniq ??= u.uniques?.length||0; u.lastUniq ??= u.uniques?.at(-1)||0; u.sinceD ??= u.rolls; u.dd ??= []; delete u.uniques; }
 S.log=(S.log||[]).filter(l=>l.u==='megumin');
 const save = ()=>{ try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){} };
 
@@ -250,7 +260,7 @@ function traitHTML(tr){ return iconHTML(tr.id)+(isRare(tr) ? `<span class="rainb
 // aplica um giro ao estado (sem mexer na tela); devolve info
 function applyRoll(){
   const u=S.units[S.sel], traits=rollTraits();
-  u.traits=traits; u.rolls++; u.since++;
+  u.traits=traits; u.rolls++; u.since++; u.sinceD++;
   if(traits.length===2) S.doubles++;
   for(const tr of traits) S.counts[tr.id]=(S.counts[tr.id]||0)+1;
   const uniq=traits.filter(t=>t.id==='unique').length;
@@ -260,7 +270,8 @@ function applyRoll(){
     if(S.log.length>60) S.log.length=60;
   }
   let took=0;
-  if(uniq){ took=u.since; u.uniques.push(took); u.since=0; }
+  if(uniq){ took=u.since; u.nUniq++; u.lastUniq=took; u.since=0; }
+  if(uniq===2){ u.dd.push(u.sinceD); u.sinceD=0; }
   return {traits,uniq,rare,took};
 }
 
@@ -275,7 +286,8 @@ function render(pop){
   if(pop){ el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); }
 
   const total=UNITS.reduce((s,x)=>s+S.units[x.id].rolls,0);
-  const nUniq=UNITS.reduce((s,x)=>s+S.units[x.id].uniques.length,0);
+  const nUniq=u.nUniq;
+  $('sSinceD').textContent=fmt(u.sinceD); $('sDD').textContent=fmt(u.dd.length);
   $('sUnit').textContent=fmt(u.rolls); $('sSince').textContent=fmt(u.since);
   $('sTotal').textContent=fmt(total); $('sUniq').textContent=fmt(nUniq);
   $('sRem').textContent=fmt(total*REMNANTS_PER_ROLL); $('sTok').textContent=fmt(total); $('sRbx').textContent=fmt(total*ROBUX_PER_TOKEN);
@@ -283,13 +295,18 @@ function render(pop){
   // sorte
   const avg=Math.round(1/P_UNIQUE), med=Math.ceil(Math.log(.5)/Math.log(1-P_UNIQUE));
   let h=`Em média leva <b>${fmt(avg)}</b> giros para sair Unique (metade das pessoas pega em até <b>${fmt(med)}</b>).`;
-  if(u.uniques.length){
-    const n=u.uniques[u.uniques.length-1], worse=(1-P_UNIQUE)**n*100;
+  if(u.nUniq){
+    const n=u.lastUniq, worse=(1-P_UNIQUE)**n*100;
     h+=`<br>Seu último Unique na ${unit.name} saiu em <b>${fmt(n)}</b> giros — mais sortudo que <b>${worse.toFixed(1).replace('.',',')}%</b> das tentativas.`;
   }
   if(u.since>0){
     const p=(1-(1-P_UNIQUE)**u.since)*100;
     h+=`<br>Seca atual: ${fmt(u.since)} giros. <b>${p.toFixed(1).replace('.',',')}%</b> das pessoas já teriam pego o Unique até aqui.`;
+  }
+  h+=`<br><br><span class="rainbow" style="font-weight:700">Double Unique</span>: chance de 1 em <b>${fmt(Math.round(1/P_DD))}</b> por giro (trait duplo 0,2% × Unique 0,1% × Unique 0,1%).`;
+  if(u.dd.length){
+    const n=u.dd[u.dd.length-1], worse=Math.exp(-P_DD*n)*100;
+    h+=`<br>Seu último Double Unique saiu em <b>${fmt(n)}</b> giros — mais sortudo que <b>${worse.toFixed(1).replace('.',',')}%</b> das tentativas. Seriam <b>${fmt(n*REMNANTS_PER_ROLL)}</b> Star Remnants.`;
   }
   $('luck').innerHTML=h;
 
@@ -337,7 +354,7 @@ function celebrate(count,unitName){
   fx.innerHTML=`<div class="hue"><div class="flood"></div><div class="rays"></div>
     <div class="center">
       <img class="crown" alt="" referrerpolicy="no-referrer" src="${CROWN_URL}">
-      <div class="uq"><span>Unique${count>1?' ×2':''}</span></div>
+      <div class="uq"><span>${count>1?'Double Unique':'Unique'}</span></div>
       <div class="who">${unitName}</div>
     </div>${sparks}</div>
     <div class="rr">Rerolled trait!</div><div class="flash"></div>`;
@@ -370,6 +387,43 @@ $('btnInst').onclick=()=>{
   render(true); save();
   if(r.uniq) celebrate(r.uniq,UNITS.find(x=>x.id===S.sel).name);
 };
+// ---------- até o Double Unique (centenas de milhões de giros, em lotes rápidos) ----------
+const CUM=[]; { let a=0; for(const t of TRAITS){ a+=t.w/TOTAL_W; CUM.push(a); } }
+const UQ=TRAITS.length-1;
+let ddRun=false;
+function setBusy(on){ for(const id of ['btnRoll','btnAuto','btnInst','btnTest','btnReset']) $(id).disabled=on; }
+function stopDD(){ ddRun=false; setBusy(false); $('btnDD').classList.remove('on'); $('btnDD').textContent='Até o Double Unique 👑👑'; render(true); save(); }
+$('btnDD').onclick=()=>{
+  if(ddRun) return stopDD();
+  stopAuto(); ddRun=true; setBusy(true); $('btnDD').classList.add('on');
+  const u=S.units[S.sel], cnt=new Float64Array(TRAITS.length);
+  const pick=()=>{ const r=Math.random(); let i=0; while(i<UQ && r>=CUM[i]) i++; return i; };
+  let started=0;
+  (function chunk(){
+    if(!ddRun) return;
+    const t0=performance.now(); let hit=false, n=0, dbl=0, since=u.since, nU=0, last=u.lastUniq;
+    cnt.fill(0);
+    while(!hit && performance.now()-t0<40){
+      for(let k=0;k<200000;k++){
+        n++; since++;
+        if(Math.random()<DOUBLE_CHANCE){
+          const a=pick(), b=pick(); dbl++; cnt[a]++; cnt[b]++;
+          if(a===UQ||b===UQ){ nU++; last=since; since=0; if(a===UQ&&b===UQ){ hit=true; break; } }
+        } else { const a=pick(); cnt[a]++; if(a===UQ){ nU++; last=since; since=0; } }
+      }
+    }
+    u.rolls+=n; u.sinceD+=n; u.since=since; u.nUniq+=nU; u.lastUniq=last; S.doubles+=dbl; started+=n;
+    TRAITS.forEach((t,i)=>{ if(cnt[i]) S.counts[t.id]=(S.counts[t.id]||0)+cnt[i]; });
+    if(hit){
+      u.traits=[{id:'unique',tier:0},{id:'unique',tier:0}]; u.dd.push(u.sinceD); u.sinceD=0;
+      S.log.unshift({u:S.sel,t:u.traits,n:u.rolls}); if(S.log.length>60) S.log.length=60;
+      stopDD(); celebrate(2,UNITS.find(x=>x.id===S.sel).name); return;
+    }
+    $('btnDD').textContent=`Parar · ${(started/1e6).toFixed(1).replace('.',',')} mi de giros`;
+    $('sUnit').textContent=$('sTotal').textContent=fmt(u.rolls); $('sSinceD').textContent=fmt(u.sinceD); $('sUniq').textContent=fmt(u.nUniq);
+    setTimeout(chunk,0);
+  })();
+};
 $('btnTest').onclick=()=>celebrate(1,UNITS.find(x=>x.id===S.sel).name+' (teste — não conta)');
 let resetArm=null;
 $('btnReset').onclick=()=>{
@@ -378,8 +432,8 @@ $('btnReset').onclick=()=>{
     resetArm=setTimeout(()=>{resetArm=null;b.textContent='Zerar tudo';b.style.background=''},3000); return; }
   clearTimeout(resetArm); resetArm=null; b.textContent='Zerar tudo'; b.style.background='';
   stopAuto(); const sel=S.sel; S={sel,units:{},counts:{},doubles:0,log:[]};
-  for(const u of UNITS) S.units[u.id]={traits:null,rolls:0,since:0,uniques:[]}; save(); render(); };
-addEventListener('keydown',e=>{ if(e.code==='Space'&&!/SELECT|INPUT|BUTTON/.test(e.target.tagName)){ e.preventDefault(); if($('fx').classList.contains('on')) return $('fx').onclick(); stopAuto(); doRoll(); } });
+  for(const u of UNITS) S.units[u.id]=newUnit(); save(); render(); };
+addEventListener('keydown',e=>{ if(e.code==='Space'&&!/SELECT|INPUT|BUTTON/.test(e.target.tagName)){ e.preventDefault(); if($('fx').classList.contains('on')) return $('fx').onclick(); if(ddRun) return; stopAuto(); doRoll(); } });
 render();
 </script>
 </body>
